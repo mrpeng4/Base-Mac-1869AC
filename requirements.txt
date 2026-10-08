@@ -1,2 +1,3 @@
 pygame-ce
 python-vlc
+requires vlc desktop as well :)
