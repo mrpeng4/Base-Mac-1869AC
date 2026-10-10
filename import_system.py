@@ -1,5 +1,6 @@
 from pathlib import Path
 import importlib
+import os
 import keyword
 import re
 import songs_path
@@ -42,7 +43,7 @@ def append_folder_to_songs_path(folder_path, playlist_name):
         return False
 
     else:
-        path = Path(folder_path).expanduser().resolve()
+        path = Path(folder_path.strip().strip("'\"")).expanduser().resolve()
         if not path.is_dir():
             print(f"Error: Directory '{folder_path}' not found.")
             return False
@@ -70,7 +71,6 @@ def save_playlist_to_songs_path(playlist_name, songs):
     match = pattern.search(content)
 
     comment_line = match.group(1) or ""
-    # main.py would sync this playlist with its folder again on startup and undo the edit
     if comment_line.startswith("# Auto-imported"):
         comment_line = "# Edited playlist (folder sync off)\n"
 
@@ -116,13 +116,16 @@ def delete_song_from_playlist(playlist_name, song_index):
 
     removed_song = songs.pop(song_index)
     save_playlist_to_songs_path(playlist_name, songs)
-    print(f"Removed '{removed_song.split('/')[-1]}' from '{playlist_name}'.")
+    print(f"Removed '{Path(removed_song).name}' from '{playlist_name}'.")
     return True
 
 def add_song_to_playlist(playlist_name, song_path):
 
     songs = list(getattr(songs_path, playlist_name, []))
-    path = Path(song_path.strip().strip("'\"").replace("\\ ", " ")).expanduser().resolve()
+    song_path = song_path.strip().strip("'\"")
+    if os.name != "nt":
+        song_path = song_path.replace("\\ ", " ")
+    path = Path(song_path).expanduser().resolve()
 
     if not path.is_file():
         print(f"Error: File '{song_path}' not found.")

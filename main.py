@@ -2,10 +2,10 @@ import json
 import os
 import sys
 
-# stderr_fd = sys.stderr.fileno()
-# devnull = os.open(os.devnull, os.O_WRONLY)
-# os.dup2(devnull, stderr_fd)
-# os.close(devnull)
+stderr_fd = sys.stderr.fileno()
+devnull = os.open(os.devnull, os.O_WRONLY)
+os.dup2(devnull, stderr_fd)
+os.close(devnull)
 
 import time
 try:
@@ -80,7 +80,7 @@ def sync_playlists_with_folders():
 
 sync_playlists_with_folders()
 
-with open("songs_path.py", "r") as song:
+with open("songs_path.py", "r", encoding="utf-8") as song:
     if not song.read().strip():
         while True:
             print("\033[H\033[2J", end="", flush=True)
@@ -140,7 +140,7 @@ while True:
             playlist = getattr(songs_path, name_for_Playlist)
             current_song_index = user_saves["index_of_song"]
             current_song = playlist[current_song_index]
-            current_song_name = current_song.split("/")[-1]
+            current_song_name = os.path.basename(current_song)
 
             player = vlc.MediaPlayer(current_song)
             player.play()
@@ -174,7 +174,7 @@ while True:
 
             current_song_index = 0
             current_song = playlist[current_song_index]
-            current_song_name = current_song.split("/")[-1]
+            current_song_name = os.path.basename(current_song)
 
             player = vlc.MediaPlayer(current_song)
             player.play()
